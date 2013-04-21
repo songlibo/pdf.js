@@ -122,6 +122,23 @@ var Parser = (function ParserClosure() {
         this.shift();
         if (cipherTransform)
           str = cipherTransform.decryptString(str);
+
+        var mybytes = stringToBytes(str);
+        var view = new DataView(mybytes.buffer);
+        try {
+          var text = new TextDecoder('gbk').decode(view);
+          // text += ': [';
+          // for (var idx=0; idx < mybytes.length; ++idx) {
+          //   text += mybytes[idx] + ',';
+          // }
+          // text += ']';
+          // console.log(str + ' ==> ' + text);
+          if (global_getencrypt) {
+            str = text;
+          }
+        } catch (e) {
+        }
+
         return str;
       }
 

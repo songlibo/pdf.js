@@ -22,6 +22,8 @@
 
 'use strict';
 
+var global_getencrypt = false;
+
 var Name = (function NameClosure() {
   function Name(name) {
     this.name = name;
@@ -424,6 +426,7 @@ var XRef = (function XRefClosure() {
         var fileId = (ids && ids.length) ? ids[0] : '';
         this.encrypt = new CipherTransformFactory(
             encrypt, fileId, this.password);
+        global_getencrypt = true;
       }
 
       // get the root dictionary (catalog) object

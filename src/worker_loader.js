@@ -19,6 +19,8 @@
 
 // List of files to include;
 var files = [
+  '../stringencoding/encoding-indexes.js',
+  '../stringencoding/encoding.js',
   'network.js',
   'chunked_stream.js',
   'pdf_manager.js',
