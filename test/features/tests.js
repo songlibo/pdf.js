@@ -1,5 +1,3 @@
-/* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
-/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright 2012 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +23,7 @@ Promise.prototype = {
   resolve: function (result) {
     if ('result' in this) return;
     this.result = result;
-    if ('callback' in this) this.callback(result); 
+    if ('callback' in this) this.callback(result);
   }
 };
 
@@ -276,6 +274,18 @@ var tests = [
     area: 'Core'
   },
   {
+    id: 'atob',
+    name: 'atob() is present',
+    run: function () {
+      if ('atob' in window)
+        return { output: 'Success', emulated: '' };
+      else
+        return { output: 'Failed', emulated: 'Yes' };
+    },
+    impact: 'Critical',
+    area: 'Core'
+  },
+  {
     id: 'Function-bind',
     name: 'Function.prototype.bind is present',
     run: function () {
@@ -362,10 +372,7 @@ var tests = [
       var ctx = canvas.getContext('2d');
       ctx.rect(1, 1, 50, 50);
       ctx.rect(5, 5, 41, 41);
-      ['fillRule', 'mozFillRule', 'webkitFillRule'].forEach(function (name) {
-        if (name in ctx) ctx[name] = 'evenodd';
-      });
-      ctx.fill();
+      ctx.fill('evenodd');
 
       var data = ctx.getImageData(0, 0, 50, 50).data;
       var isEvenOddFill = data[20 * 4 + 20 * 200 + 3] == 0 &&
@@ -395,9 +402,6 @@ var tests = [
       if ('setLineDash' in ctx) {
         ctx.setLineDash([10, 10]);
         ctx.lineDashOffset = 0;
-      } else {
-        ctx.mozDash = [10, 10];
-        ctx.mozDashOffset = 0;
       }
       ctx.stroke();
 
@@ -470,18 +474,6 @@ var tests = [
     area: 'Core'
   },
   {
-    id: 'TextDecoder',
-    name: 'TextDecoder is present',
-    run: function () {
-      if (typeof TextDecoder != 'undefined')
-        return { output: 'Success', emulated: '' };
-      else
-        return { output: 'Failed', emulated: 'No' };
-    },
-    impact: 'Critical',
-    area: 'Core'
-  },
-  {
     id: 'Worker',
     name: 'Worker is present',
     run: function () {
@@ -526,8 +518,41 @@ var tests = [
     area: 'Core'
   },
   {
+    id: 'Worker-transfers',
+    name: 'Worker can use transfers for postMessage',
+    run: function () {
+      if (typeof Worker == 'undefined')
+        return { output: 'Skipped', emulated: '' };
+
+      try {
+        var worker = new Worker('worker-stub.js');
+
+        var promise = new Promise();
+        var timeout = setTimeout(function () {
+          promise.resolve({ output: 'Failed', emulated: '?' });
+        }, 5000);
+
+        worker.addEventListener('message', function (e) {
+          var data = e.data;
+          if (data.action == 'test-transfers' && data.result)
+            promise.resolve({ output: 'Success', emulated: '' });
+          else
+            promise.resolve({ output: 'Failed', emulated: 'Yes' });
+        }, false);
+        var testObj = new Uint8Array([255]);
+        worker.postMessage({action: 'test-transfers',
+          data: testObj}, [testObj.buffer]);
+        return promise;
+      } catch (e) {
+        return { output: 'Failed', emulated: 'Yes' };
+      }
+    },
+    impact: 'Normal',
+    area: 'Core'
+  },
+  {
     id: 'Worker-xhr-response',
-    name: 'XMLHttpRequest supports the reponse property in web workers',
+    name: 'XMLHttpRequest supports the response property in web workers',
     run: function () {
       if (typeof Worker == 'undefined')
         return { output: 'Skipped', emulated: '' };
@@ -551,46 +576,6 @@ var tests = [
         return promise;
       } catch (e) {
         return { output: 'Failed', emulated: 'Yes' };
-      }
-    },
-    impact: 'Important',
-    area: 'Core'
-  },
-  {
-    id: 'Worker-TextDecoder',
-    name: 'TextDecoder is present in web workers',
-    run: function () {
-      if (typeof Worker == 'undefined')
-        return { output: 'Skipped', emulated: '' };
-
-      var emulatable = typeof TextDecoder !== 'undefined';
-      try {
-        var worker = new Worker('worker-stub.js');
-
-        var promise = new Promise();
-        var timeout = setTimeout(function () {
-          promise.resolve({ output: 'Failed',
-                            emulated: emulatable ? '?' : 'No' });
-        }, 5000);
-
-        worker.addEventListener('message', function (e) {
-          var data = e.data;
-          if (data.action === 'TextDecoder') {
-            if (data.result) {
-              promise.resolve({ output: 'Success', emulated: '' });
-            } else {
-              promise.resolve({ output: 'Failed',
-                                emulated: data.emulated ? 'Yes' : 'No' });
-            }
-          } else {
-            promise.resolve({ output: 'Failed',
-                              emulated: emulatable ? 'Yes' : 'No' });
-          }
-        }, false);
-        worker.postMessage({action: 'TextDecoder'});
-        return promise;
-      } catch (e) {
-        return { output: 'Failed', emulated: emulatable ? 'Yes' : 'No' };
       }
     },
     impact: 'Important',
@@ -669,4 +654,3 @@ function checkCanvas(font) {
     colors[2][2] * 3 < counts[2][2];
   return isPlus;
 }
-

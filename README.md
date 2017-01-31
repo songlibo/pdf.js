@@ -1,155 +1,144 @@
-# PDF.JS
+# PDF.js
 
-pdf.js is an HTML5 technology experiment that explores building a faithful
-and efficient Portable Document Format (PDF) renderer without native code 
-assistance.
+PDF.js is a Portable Document Format (PDF) viewer that is built with HTML5.
 
-pdf.js is community-driven and supported by Mozilla Labs. Our goal is to 
-create a general-purpose, web standards-based platform for parsing and 
-rendering PDFs, and eventually release a PDF reader extension powered by 
-pdf.js.
+PDF.js is community-driven and supported by Mozilla Labs. Our goal is to
+create a general-purpose, web standards-based platform for parsing and
+rendering PDFs.
 
- 
+## Contributing
 
-# Getting started
+PDF.js is an open source project and always looking for more contributors. To
+get involved checkout:
+
++ [Issue Reporting Guide](https://github.com/mozilla/pdf.js/blob/master/.github/CONTRIBUTING.md)
++ [Code Contribution Guide](https://github.com/mozilla/pdf.js/wiki/Contributing)
++ [Frequently Asked Questions](https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions)
++ [Good Beginner Bugs](https://github.com/mozilla/pdf.js/issues?direction=desc&labels=5-good-beginner-bug&page=1&sort=created&state=open)
++ [Priorities](https://github.com/mozilla/pdf.js/milestones)
++ [Attend a Public Meeting](https://github.com/mozilla/pdf.js/wiki/Weekly-Public-Meetings)
+
+For further questions or guidance feel free to stop by #pdfjs on
+irc.mozilla.org.
+
+## Getting Started
 
 ### Online demo
 
-For an online demo, visit:
++ https://mozilla.github.io/pdf.js/web/viewer.html
 
-+ http://mozilla.github.io/pdf.js/web/viewer.html
+### Browser Extensions
 
-This demo provides an interactive interface for displaying and browsing PDFs
-using the pdf.js API.
+#### Firefox (and Seamonkey)
 
-### Extension
+PDF.js is built into version 19+ of Firefox, however one extension is still available:
 
-A Firefox extension is availble in two places:
++ [Development Version](http://mozilla.github.io/pdf.js/extensions/firefox/pdf.js.xpi) - This extension is mainly intended for developers/testers, and it is updated every time new code is merged into the PDF.js codebase. It should be quite stable, but might break from time to time.
 
-+ Stable Version: https://addons.mozilla.org/firefox/addon/pdfjs
-+ Development Version: http://mozilla.github.io/pdf.js/extensions/firefox/pdf.js.xpi
+  + Please note that the extension is *not* guaranteed to be compatible with Firefox versions that are *older* than the current ESR version, see the [Release Calendar](https://wiki.mozilla.org/RapidRelease/Calendar#Past_branch_dates).
 
-The development extension should be quite stable but still might break from time to time.
-Also, note that the development extension is updated on every merge and by default Firefox will
-auto-update extensions on a daily basis (you can change this through the 
-`extensions.update.interval` option in `about:config`).
+  + The extension should also work in Seamonkey, provided that it is based on a Firefox version as above (see [Which version of Firefox does SeaMonkey 2.x correspond with?](https://wiki.mozilla.org/SeaMonkey/FAQ#General)), but we do *not* guarantee compatibility.
 
-For an experimental Chrome extension, get the code as explained below and issue `node make extension`. 
-Then open Chrome, go to `Tools > Extension` and load the (unpackaged) extension
-from the directory `build/chrome`.
+#### Chrome
 
-### Getting the code
++ The official extension for Chrome can be installed from the [Chrome Web Store](https://chrome.google.com/webstore/detail/pdf-viewer/oemmndcbldboiebfnladdacbdfmadadm).
+*This extension is maintained by [@Rob--W](https://github.com/Rob--W).*
++ Build Your Own - Get the code as explained below and issue `gulp chromium`. Then open
+Chrome, go to `Tools > Extension` and load the (unpackaged) extension from the
+directory `build/chromium`.
+
+## Getting the Code
 
 To get a local copy of the current code, clone it using git:
 
-    $ git clone git://github.com/mozilla/pdf.js.git pdfjs
-    $ cd pdfjs
+    $ git clone git://github.com/mozilla/pdf.js.git
+    $ cd pdf.js
 
-Next, you need to start a local web server as some browsers don't allow opening
-PDF files for a file:// url:
+Next, install Node.js via the [official package](http://nodejs.org) or via
+[nvm](https://github.com/creationix/nvm). You need to install the gulp package
+globally (see also [gulp's getting started](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#getting-started)):
 
-    $ node make server
+    $ npm install -g gulp-cli
 
-You can install Node via [nvm](https://github.com/creationix/nvm) or the 
-[official package](http://nodejs.org). If everything worked out, you can now serve 
+If everything worked out, install all dependencies for PDF.js:
+
+    $ npm install
+
+Finally you need to start a local web server as some browsers do not allow opening
+PDF files using a file:// URL. Run
+
+    $ gulp server
+
+and then you can open
 
 + http://localhost:8888/web/viewer.html
 
-You can also view all the test pdf files on the right side serving
+It is also possible to view all test PDF files on the right side by opening
 
 + http://localhost:8888/test/pdfs/?frame
 
-### Building pdf.js.
+## Building PDF.js
 
-In order to bundle all `src/` files into a final `pdf.js` and build the generic viewer, issue:
+In order to bundle all `src/` files into two productions scripts and build the generic
+viewer, issue:
 
-    $ node make generic
+    $ gulp generic
 
-This will generate the file `build/generic/build/pdf.js` that can be included in your final project. The pdf.js file is large and should be minified for production. Also, if you would like to support more browsers than firefox you'll also need to include `compatibility.js` from `build/generic/web/`.
+This will generate `pdf.js` and `pdf.worker.js` in the `build/generic/build/` directory.
+Both scripts are needed but only `pdf.js` needs to be included since `pdf.worker.js` will
+be loaded by `pdf.js`. If you want to support more browsers than Firefox you'll also need
+to include `compatibility.js` from `build/generic/web/`. The PDF.js files are large and
+should be minified for production.
 
+## Using PDF.js in a web application
 
-# Learning
+To use PDF.js in a web application you can choose to use a pre-built version of the library
+or to build it from source. We supply pre-built versions for usage with NPM and Bower under
+the `pdfjs-dist` name. For more information and examples please refer to the
+[wiki page](https://github.com/mozilla/pdf.js/wiki/Setup-pdf.js-in-a-website) on this subject.
 
-You can play with the PDF.js API directly from your browser through the live demos below:
+## Learning
 
-+ Hello world: http://jsbin.com/pdfjs-helloworld-v2/edit#html,live
-+ Simple reader with prev/next page controls: http://jsbin.com/pdfjs-prevnext-v2/edit#html,live
+You can play with the PDF.js API directly from your browser through the live
+demos below:
+
++ [Hello world](http://mozilla.github.io/pdf.js/examples/learning/helloworld.html)
++ [Simple reader with prev/next page controls](http://mozilla.github.io/pdf.js/examples/learning/prevnext.html)
 
 The repo contains a hello world example that you can run locally:
 
 + [examples/helloworld/](https://github.com/mozilla/pdf.js/blob/master/examples/helloworld/)
 
-For an introduction to the PDF.js code, check out the presentation by our contributor Julian Viereck:
+For an introduction to the PDF.js code, check out the presentation by our
+contributor Julian Viereck:
 
 + http://www.youtube.com/watch?v=Iv15UY-4Fg8
 
-Additional learning resources can be found at:
-
-+ https://github.com/mozilla/pdf.js/wiki/Additional-Learning-Resources
-
-
-# Contributing
-
-pdf.js is a community-driven project, so contributors are always welcome. 
-Simply fork our repo and contribute away. Good starting places for picking
-a bug are the top error messages and TODOs in our corpus report:
-
-+ http://people.mozilla.com/~bdahl/corpusreport/test/ref/
-
-and of course our open Github issues:
-
-+ https://github.com/mozilla/pdf.js/issues 
-
-For better consistency and long-term stability, please do look around the 
-code and try to follow our conventions.
-More information about the contributor process can be found on the 
-[contributor wiki page](https://github.com/mozilla/pdf.js/wiki/Contributing).
-
-If you don't want to hack on the project or have little spare time, __you still
-can help!__ Just open PDFs in the 
-[online demo](http://mozilla.github.io/pdf.js/web/viewer.html) and report 
-any breakage in rendering.
-
-Our Github contributors so far:
-
-+ https://github.com/mozilla/pdf.js/contributors
-+ https://github.com/mozilla/pdf.js/blob/master/LICENSE
-
-You can add your name to it! :)
-
-
-# Running the tests
-
-pdf.js comes with browser-level regression tests that allow one to probe
-whether it's able to successfully parse PDFs, as well as compare its output
-against reference images, pixel-by-pixel.
-
-More information about running the tests can be found on the
-[contributor wiki page](https://github.com/mozilla/pdf.js/wiki/Contributing).
-
-
-# Additional resources
-
-Gallery of user projects and modifications:
-
-+ https://github.com/mozilla/pdf.js/wiki/Gallery-of-user-projects-and-modifications
-
-You can read more about pdf.js here:
+You can read more about PDF.js here:
 
 + http://andreasgal.com/2011/06/15/pdf-js/
 + http://blog.mozilla.com/cjones/2011/06/15/overview-of-pdf-js-guts/
+
+Even more learning resources can be found at:
+
 + https://github.com/mozilla/pdf.js/wiki/Additional-Learning-Resources
+
+## Questions
+
+Check out our FAQs and get answers to common questions:
+
++ https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions
 
 Talk to us on IRC:
 
 + #pdfjs on irc.mozilla.org
 
-Join our mailing list: 
+Join our mailing list:
 
 + dev-pdf-js@lists.mozilla.org
 
-Subscribe either using lists.mozilla.org or Google Groups: 
-  
+Subscribe either using lists.mozilla.org or Google Groups:
+
 + https://lists.mozilla.org/listinfo/dev-pdf-js
 + https://groups.google.com/group/mozilla.dev.pdf-js/topics
 
@@ -157,3 +146,6 @@ Follow us on twitter: @pdfjs
 
 + http://twitter.com/#!/pdfjs
 
+Weekly Public Meetings
+
++ https://github.com/mozilla/pdf.js/wiki/Weekly-Public-Meetings
