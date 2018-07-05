@@ -124,19 +124,27 @@ var Parser = (function ParserClosure() {
           str = cipherTransform.decryptString(str);
 
         var mybytes = stringToBytes(str);
-        var view = new DataView(mybytes.buffer);
-        try {
-          var text = new TextDecoder('gbk').decode(view);
-          // text += ': [';
-          // for (var idx=0; idx < mybytes.length; ++idx) {
-          //   text += mybytes[idx] + ',';
-          // }
-          // text += ']';
-          // console.log(str + ' ==> ' + text);
-          if (global_getencrypt) {
-            str = text;
+        // 0xfffe in UTF-8; this is the byte order mark in UTF-16.
+        if (mybytes.length > 2 && mybytes[0] == 0xFF && mybytes[1] == 0xFE) {
+            var view = new DataView(mybytes.buffer, 2);
+            try {
+              var text = new TextDecoder('utf-16be').decode(view);
+              // console.log(str + ' ==> [UTF-16BE] ' + text);
+              if (global_getencrypt) {
+                str = text;
+              }
+            } catch (e) {
+            }
+        } else {
+          var view = new DataView(mybytes.buffer);
+          try {
+            var text = new TextDecoder('gbk').decode(view);
+            console.log(str + ' ==> [GBK] ' + text);
+            if (global_getencrypt) {
+              str = text;
+            }
+          } catch (e) {
           }
-        } catch (e) {
         }
 
         return str;
